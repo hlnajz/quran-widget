@@ -106,5 +106,5 @@ For any questions or issues, feel free to reach out to the project creator:
 
 Hamza Labbaalli
 GitHub
-Website
+Website https://hlnajz.com
 ```
