@@ -1,12 +1,12 @@
 const express = require("express");
 const { createCanvas } = require("canvas");
-const path = require("path");
+const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Load Ayat from the public folder (static files on Vercel)
-const ayat = require("../quran-widget/public/ayat.json");
+// Load Ayat from JSON file
+const ayat = JSON.parse(fs.readFileSync("./public/ayat.json", "utf-8"));
 
 // Helper Function: Get a Random Ayah
 function getRandomAyah() {

@@ -2,22 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "index.js",
+      "src": "api/index.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/ayat/image",
-      "dest": "/index.js"
-    },
-    {
-      "src": "/api/ayat/json",
-      "dest": "/index.js"
-    },
-    {
-      "src": "/public/(.*)",
-      "dest": "/public/$1"
+      "src": "/(.*)",
+      "dest": "api/index.js"
     }
   ]
 }
