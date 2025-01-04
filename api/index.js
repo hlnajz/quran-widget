@@ -1,62 +1,61 @@
-const express = require("express");
-const { createCanvas } = require("canvas");
 const fs = require("fs");
+const path = require("path");
+const express = require("express");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Load Ayat from JSON file
-const ayat = JSON.parse(fs.readFileSync("./public/ayat.json", "utf-8"));
-
-// Helper Function: Get a Random Ayah
-function getRandomAyah() {
-  return ayat[Math.floor(Math.random() * ayat.length)];
+// Utility function to read the ayat.json file
+function getAyatData() {
+  try {
+    const data = fs.readFileSync(path.join(__dirname, "ayat.json"), "utf-8");
+    return JSON.parse(data);
+  } catch (error) {
+    console.error("Error reading ayat.json file:", error);
+    return null;
+  }
 }
 
-// Route 1: Return Random Ayah as JSON
+// Endpoint to get random Ayah
 app.get("/api/ayat/json", (req, res) => {
-  const randomAyah = getRandomAyah();
-  res.json(randomAyah);
+  const ayatData = getAyatData();
+  if (ayatData) {
+    const randomIndex = Math.floor(Math.random() * ayatData.length);
+    const randomAyah = ayatData[randomIndex];
+    res.json(randomAyah);
+  } else {
+    res.status(500).json({ error: "Failed to read ayat.json" });
+  }
 });
 
-// Route 2: Generate and Return Ayah as Image
+// Endpoint to get random Ayah with image URL using Shields.io for dynamic image
 app.get("/api/ayat/image", (req, res) => {
-  const { theme = "dark", type = "vertical", lang = "arabic" } = req.query;
-  const randomAyah = getRandomAyah();
+  const { lang, theme, type } = req.query;
 
-  const canvas = createCanvas(800, type === "vertical" ? 300 : 200);
-  const ctx = canvas.getContext("2d");
+  const ayatData = getAyatData();
+  if (ayatData) {
+    const randomIndex = Math.floor(Math.random() * ayatData.length);
+    const randomAyah = ayatData[randomIndex];
 
-  // Background Color
-  ctx.fillStyle = theme === "dark" ? "#1a1a1d" : "#ffffff";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Dynamic image URL using Shields.io
+    const imageUrl = `https://img.shields.io/badge/${type}-${lang}-${
+      theme === "dark" ? "black" : "yellow"
+    }`;
 
-  // Text Styling
-  const text = randomAyah.text[lang.toLowerCase()] || randomAyah.text["arabic"];
-  ctx.font = "20px Arial";
-  ctx.fillStyle = theme === "dark" ? "#ffffff" : "#000000";
-  ctx.fillText(text, 50, 100);
-
-  ctx.font = "16px Arial";
-  ctx.fillText(
-    `- Surah: ${randomAyah.surah}, Ayah: ${randomAyah.ayah}`,
-    50,
-    150
-  );
-
-  // Return as PNG Image
-  res.setHeader("Content-Type", "image/png");
-  res.send(canvas.toBuffer());
+    res.json({
+      text: randomAyah.text,
+      translation: randomAyah.translation,
+      imageUrl: imageUrl,
+    });
+  } else {
+    res.status(500).json({ error: "Failed to read ayat.json" });
+  }
 });
 
-// Home Route
-app.get("/", (req, res) => {
-  res.send(
-    "Quran Ayat Widget is running! Use /api/ayat/json or /api/ayat/image."
-  );
-});
+// Serve static files from the public folder
+app.use(express.static(path.join(__dirname, "public")));
 
-// Start Server
+// Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });

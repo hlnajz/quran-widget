@@ -1,15 +1,16 @@
 {
   "name": "quran-widget",
   "version": "1.0.0",
-  "main": "api/index.js",
+  "description": "A dynamic API for Quran Ayat with image generation",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "vercel-build": "npm install"
+  },
   "dependencies": {
-    "fs": "0.0.1-security",
     "express": "^4.17.1"
   },
-  "scripts": {
-    "dev": "node api/index.js"
-  },
   "engines": {
-    "node": "22.x"
+    "node": "14.x"
   }
 }
